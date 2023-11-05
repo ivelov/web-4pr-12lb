@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Лаба 12</title>
+  </head>
+  <body>
+    <div id="result"></div>
+    <script>
+      class Student {
+        lastname = "";
+        name = "";
+        grades = {};
+
+        constructor(name, lastname, grades) {
+          this.name = name;
+          this.lastname = lastname;
+          this.grades = grades;
+        }
+      }
+
+      const students = [
+        new Student("name1", "lastname1", { math: 4, history: 2, js: 4 }),
+        new Student("name2", "lastname2", { math: 2, history: 1, js: 3 }),
+        new Student("name3", "lastname3", { math: 5, history: 5, js: 5 }),
+      ];
+
+      class ListOfStudents {
+        students = [];
+        constructor(students) {
+          this.students = students;
+        }
+
+        getTableList() {
+          let tableHtml = `<table>
+            <thead><tr><th>Name</th><th>LastName</th><th>Math</th><th>History</th><th>JS</th></tr></thead>
+              <tbody>`;
+
+          for (const student of this.students) {
+            tableHtml += `<tr><td>${student.name}</td><td>${student.lastname}</td><td>${student.grades.math}</td><td>${student.grades.history}</td><td>${student.grades.js}</td></tr>`;
+          }
+          tableHtml += "</tbody></table>";
+          return tableHtml;
+        }
+      }
+
+      class StylesTable extends ListOfStudents {
+        getStyles() {
+          return `<style>
+            table{
+              border-collapse: collapse;
+            }
+            td{
+              color: green;
+            }
+            th{
+              background-color: green;
+              color: white;
+            }
+            td, th{
+              border: 2px solid gray;
+            }
+          </style>`;
+        }
+
+        getAvg(student){
+          let sum = 0
+          for (const gradeKey in student.grades) {
+            sum += student.grades[gradeKey]
+          }
+          return sum / Object.keys(student.grades).length;
+        }
+
+        getTotalAvg(){
+          let sum = 0
+          let counter = 0
+          for (const student of students) {
+            for (const gradeKey in student.grades) {
+              sum += student.grades[gradeKey]
+              counter++
+            }  
+          }
+          return sum / counter;
+        }
+
+        getTableList(){
+          let [headers, data] = super.getTableList().split('</thead>')
+          headers = headers.replace('</tr>', '<th>Avg</th></tr></thead>')
+          const rows = data.split('</tr>')
+          rows.splice(-1,1)
+          for (let i = 0; i < rows.length; i++) {
+            rows[i] += `<td>${this.getAvg(students[i])}</td></tr>`
+          }
+          return headers + rows.join('') + `<p>Середній бал по групі = ${this.getTotalAvg()}</p>` + this.getStyles()
+        }
+
+      }
+
+      const list = new StylesTable(students);
+      document.getElementById("result").innerHTML = list.getTableList();
+    </script>
+  </body>
+</html>
